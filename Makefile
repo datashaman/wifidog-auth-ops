@@ -1,3 +1,6 @@
+test:
+	fab -A -H ubuntu@auth.datashaman.com test:feature/remove-riot
+
 deploy-staging:
 	fab -A -H ubuntu@auth.datashaman.com deploy:staging,feature/remove-riot,etc/users.csv
 

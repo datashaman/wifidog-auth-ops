@@ -12,22 +12,20 @@ repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
 
 def load_env(*path):
     full_path = os.path.join(template_dir, 'env', *path) + '.env'
+    print(full_path)
     if os.path.exists(full_path):
         env.environment.update(read_file(full_path))
 
-@task
-def test():
-    run('ssh -T git@github.com')
-
-@task
-def deploy(instance='auth', commit='develop', users_csv=None):
+def prepare(instance, commit, base_dir='/var/www', frontend=False, services=False, users_csv=None):
     env.instance = instance
     env.environment = {}
+
+    venv = '/home/ubuntu/.virtualenvs/auth-%s' % instance
 
     load_env(env.host)
     load_env(env.host, instance)
 
-    with cd('/var/www'):
+    with cd(base_dir):
         if not exists(instance):
             run('git clone %s %s' % (repo, instance))
 
@@ -40,11 +38,9 @@ def deploy(instance='auth', commit='develop', users_csv=None):
 
             if 'SQLALCHEMY_DATABASE_URI' not in env.environment:
                 use_local = True
-                env.environment['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////var/www/%s/data/local.db' % instance
+                env.environment['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/%s/data/local.db' % (base_dir, instance)
 
             upload_template('template.env', '.env', template_dir=template_dir, backup=False, context=env, use_jinja=True)
-
-            venv = '/home/ubuntu/.virtualenvs/%s' % instance
 
             if not exists(venv):
                 run('virtualenv -p /usr/bin/python3 %s' % venv)
@@ -59,23 +55,40 @@ def deploy(instance='auth', commit='develop', users_csv=None):
                         with open(users_csv) as f:
                             for user in csv.reader(f):
                                 run('python manage.py create_user %s %s %s' % user)
-                    run('python manage.py create_country ZA South Africa')
-                    run('python manage.py create_currency ZA ZAR "South African" Rand R')
+                    run('python manage.py create_country ZA "South Africa"')
+                    run('python manage.py create_currency -p R ZA ZAR "South African Rand"')
 
-            run('yarn')
-            run('gulp')
+            if frontend:
+                run('yarn')
+                run('gulp')
 
-    supervisor_conf = '/etc/supervisor/conf.d/%s.conf' % instance
-    upload_template('supervisor.conf', supervisor_conf, template_dir=template_dir, context=env, use_jinja=True)
+    if services:
+        supervisor_conf = '/etc/supervisor/conf.d/%s.conf' % instance
+        upload_template('supervisor.conf', supervisor_conf, template_dir=template_dir, context=env, use_jinja=True)
 
-    run('supervisorctl reread')
-    run('supervisorctl update')
+        run('supervisorctl reread')
+        run('supervisorctl update')
 
-    nginx_conf = '/etc/nginx/sites-available/%s' % instance
-    upload_template('nginx.conf', nginx_conf, template_dir=template_dir, context=env, use_jinja=True)
+        nginx_conf = '/etc/nginx/sites-available/%s' % instance
+        upload_template('nginx.conf', nginx_conf, template_dir=template_dir, context=env, use_jinja=True)
 
-    nginx_link = '/etc/nginx/sites-enabled/%s' % instance
-    if not exists(nginx_link):
-        run('ln -s %s %s' % (nginx_conf, nginx_link))
+        nginx_link = '/etc/nginx/sites-enabled/%s' % instance
+        if not exists(nginx_link):
+            run('ln -s %s %s' % (nginx_conf, nginx_link))
 
-    sudo('nginx -s reload')
+        sudo('nginx -s reload')
+
+    return venv, '%s/%s' % (base_dir, instance)
+
+@task
+def test(commit='develop'):
+    run('rm -rf /tmp/test')
+    venv, instance_dir = prepare('test', commit, '/tmp')
+    with cd(instance_dir), prefix('source %s/bin/activate' % venv):
+        run('python manage.py bootstrap_tests')
+        run('TESTING=true python tests/test_unit.py')
+
+@task
+def deploy(instance='auth', commit='develop', users_csv=None):
+    test(commit)
+    prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
