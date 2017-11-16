@@ -48,7 +48,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
             with prefix('source %s/bin/activate' % venv):
                 run('pip install -q -r requirements.txt')
 
-                if use_local and not exists('data/local.db'):
+                if use_local and not testing and not exists('data/local.db'):
                     run('python manage.py db_create_all')
                     run('python manage.py create_roles')
                     if users_csv:
