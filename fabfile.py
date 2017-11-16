@@ -3,7 +3,7 @@ import os
 
 from dotenvy import read
 from fabric import *
-from fabric.api import cd, prefix, run, task
+from fabric.api import cd, prefix, run, shell_env, task
 from fabric.contrib.files import *
 
 template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
