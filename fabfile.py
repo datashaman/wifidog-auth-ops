@@ -85,6 +85,7 @@ def test(commit='develop'):
     run('rm -rf /tmp/test')
     venv, instance_dir = prepare('test', commit, '/tmp')
     with cd(instance_dir), prefix('source %s/bin/activate' % venv):
+        run('touch data/local.db')
         run('python manage.py bootstrap_tests')
         run('TESTING=true python tests/test_unit.py')
 
