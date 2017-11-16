@@ -1,7 +1,7 @@
 import csv
 import os
 
-from dotenvy import read_file
+from dotenvy import read
 from fabric import *
 from fabric.api import cd, prefix, run, task
 from fabric.contrib.files import *
@@ -12,11 +12,11 @@ repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
 
 def load_env(*path):
     full_path = os.path.join(template_dir, 'env', *path) + '.env'
-    print(full_path)
     if os.path.exists(full_path):
-        env.environment.update(read_file(full_path))
+        with open(full_path) as env_file:
+            env.environment.update(read(env_file))
 
-def prepare(instance, commit, base_dir='/var/www', frontend=False, services=False, users_csv=None):
+def prepare(instance, commit, base_dir='/var/www', frontend=False, services=False, users_csv=None, testing=False):
     env.instance = instance
     env.environment = {}
 
@@ -83,11 +83,11 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
 @task
 def test(commit='develop'):
     run('rm -rf /tmp/test')
-    venv, instance_dir = prepare('test', commit, '/tmp')
-    with cd(instance_dir), prefix('source %s/bin/activate' % venv):
+    venv, instance_dir = prepare('test', commit, '/tmp', testing=True)
+    with shell_env(TESTING='true'), prefix('source %s/bin/activate' % venv), cd(instance_dir):
         run('touch data/local.db')
         run('python manage.py bootstrap_tests')
-        run('TESTING=true python tests/test_unit.py')
+        run('python tests/test_unit.py')
 
 @task
 def deploy(instance='auth', commit='develop', users_csv=None):
