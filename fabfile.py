@@ -33,6 +33,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
         with cd(instance):
             run('git remote update -p')
             run('git checkout %s' % commit)
+            run('git pull --ff-only')
 
             use_local = False
 
