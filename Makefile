@@ -6,3 +6,6 @@ deploy-staging:
 
 deploy-test:
 	fab -A -H ubuntu@auth.datashaman.com test
+
+downstream-staging:
+	fab -A -H ubuntu@auth.datashaman.com downstream_db:auth,staging
