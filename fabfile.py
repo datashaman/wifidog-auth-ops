@@ -91,7 +91,6 @@ def test(commit='develop'):
 
 @task
 def deploy(instance='auth', commit='develop', users_csv=None):
-    test(commit)
     prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
 
 @task

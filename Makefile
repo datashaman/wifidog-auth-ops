@@ -2,7 +2,7 @@ test:
 	fab -A -H ubuntu@auth.datashaman.com test:origin/release/0.8.0
 
 deploy-staging:
-	fab -A -H ubuntu@auth.datashaman.com deploy:staging,origin/release/0.8.0
+	drone deploy datashaman/wifidog-auth-flask $(BUILD) staging
 
 deploy-test:
 	fab -A -H ubuntu@auth.datashaman.com test
