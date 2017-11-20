@@ -28,11 +28,11 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
 
     with cd(base_dir):
         if not exists(instance):
-            run('git clone %s %s' % (repo, instance))
+            run('git clone -q %s %s' % (repo, instance))
 
         with cd(instance):
             run('git remote update -p')
-            run('git checkout %s' % commit)
+            run('git checkout -q %s' % commit)
 
             use_local = False
 
