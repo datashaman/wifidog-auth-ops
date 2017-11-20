@@ -41,7 +41,8 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
                 use_local = True
                 env.environment['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/%s/data/local.db' % (base_dir, instance)
 
-            upload_template('template.env', '.env', template_dir=template_dir, backup=False, context=env, use_jinja=True)
+            if not exists('.env'):
+                upload_template('template.env', '.env', template_dir=template_dir, backup=False, context=env, use_jinja=True)
 
             if not exists(venv):
                 run('virtualenv -p /usr/bin/python3 %s' % venv)
