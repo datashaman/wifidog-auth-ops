@@ -91,8 +91,9 @@ def test(commit='develop'):
         run('python -m unittest discover -s tests')
 
 @task
-def deploy(instance='auth', commit='develop', users_csv=None):
-    test(commit)
+def deploy(instance='auth', commit='develop', users_csv=None, test=True):
+    if test:
+        test(commit)
     prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
 
 @task
