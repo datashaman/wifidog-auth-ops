@@ -1,5 +1,6 @@
 import csv
 import os
+import tempfile
 
 from dotenvy import read
 from fabric import *
@@ -92,3 +93,12 @@ def test(commit='develop'):
 def deploy(instance='auth', commit='develop', users_csv=None):
     test(commit)
     prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
+
+@task
+def downstream_db(source, destination):
+    fd, filename = tempfile.mkstemp()
+    os.close(fd)
+    run('cp /var/www/%s/data/local.db %s' % (source, filename))
+    put('anonymise.sql', '/tmp')
+    put('sqlite3 %s < /tmp/anonymise.sql' % filename)
+    run('mv % /var/www/%s/data/local.db' % (filename, destination))
