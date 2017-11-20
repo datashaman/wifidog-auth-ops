@@ -21,7 +21,7 @@ set title = 'Network ' || id,
 
 update users
 set email = 'user-' || id || '@example.com',
-    password = '$6$rounds=656000$ydJG52B6JMeK/Yca$z.eNNOgdc/P6CRp.8OPw4LtLH.k7LkFbHbCgTch9UNkF96BdXxfqFcDzTOlog3PhGfhJkUjNZhUrS5aDBp.Pg0';
+    password = '$6$rounds=656000$ISOKnSzhLkrTg.Kq$zvFnALpbohoXM6NBYQG.fTkVCoK9JvS3ItUX6D71kBXyhuw9X5dLnvHD.gwkC30YIMMIRcca2yzNKyqWM1o6O.';
 
 update vouchers
 set code = random(),

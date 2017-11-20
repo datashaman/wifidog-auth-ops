@@ -85,9 +85,7 @@ def test(commit='develop'):
     run('rm -rf /tmp/test')
     venv, instance_dir = prepare('test', commit, '/tmp', testing=True)
     with shell_env(TESTING='true'), prefix('source %s/bin/activate' % venv), cd(instance_dir):
-        run('touch data/local.db')
-        run('python manage.py bootstrap_tests')
-        run('python tests/test_unit.py')
+        run('python -m unittest discover -s tests')
 
 @task
 def deploy(instance='auth', commit='develop', users_csv=None):
@@ -101,4 +99,4 @@ def downstream_db(source, destination):
     run('cp /var/www/%s/data/local.db %s' % (source, filename))
     put('anonymise.sql', '/tmp')
     run('sqlite3 %s < /tmp/anonymise.sql' % filename)
-    run('mv % /var/www/%s/data/local.db' % (filename, destination))
+    run('mv %s /var/www/%s/data/local.db' % (filename, destination))
