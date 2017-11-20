@@ -68,6 +68,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
 
         run('supervisorctl reread')
         run('supervisorctl update')
+        run('supervisorctl restart %s' % instance)
 
         nginx_conf = '/etc/nginx/sites-available/%s' % instance
         upload_template('nginx.conf', nginx_conf, template_dir=template_dir, context=env, use_jinja=True)
