@@ -41,6 +41,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
         with cd(instance):
             run('git remote update -p')
             run('git checkout -q %s' % commit)
+            run('git describe > app/static/version.txt')
 
             use_local = False
 
