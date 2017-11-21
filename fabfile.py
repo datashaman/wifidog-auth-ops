@@ -2,7 +2,7 @@ import csv
 import os
 import tempfile
 
-from dotenvy import read
+from dotenvy import parse_string
 from fabric import *
 from fabric.api import cd, get, prefix, run, shell_env, task
 from fabric.contrib.files import *
@@ -23,16 +23,18 @@ def load_env(*path):
     if exists(full_path):
         env_file = StringIO()
         get(remote_path=full_path, local_path=env_file)
-        env.environment.update(read(env_file))
+        env_string = env_file.getvalue()
+        env_file.close()
+        env.environment.update(parse_string(env_string))
 
 def prepare(instance, commit, base_dir='/var/www', frontend=False, services=False, users_csv=None, testing=False):
     env.instance = instance
     env.environment = {}
 
-    venv = '/home/ubuntu/.virtualenvs/auth-%s' % instance
-
     load_env(env.host)
     load_env(env.host, instance)
+
+    venv = '/home/ubuntu/.virtualenvs/auth-%s' % instance
 
     with cd(base_dir):
         if not exists(instance):
