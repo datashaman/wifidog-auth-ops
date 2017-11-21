@@ -4,18 +4,26 @@ import tempfile
 
 from dotenvy import read
 from fabric import *
-from fabric.api import cd, prefix, run, shell_env, task
+from fabric.api import cd, get, prefix, run, shell_env, task
 from fabric.contrib.files import *
+from six import StringIO
 
 template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
 repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
 
-def load_env(*path):
+def load_local_env(*path):
     full_path = os.path.join(template_dir, 'env', *path) + '.env'
     if os.path.exists(full_path):
         with open(full_path) as env_file:
             env.environment.update(read(env_file))
+
+def load_env(*path):
+    full_path = os.path.join('/etc', 'wifidog-auth-flask', 'env.d', *path) + '.env'
+    if exists(full_path):
+        env_file = StringIO()
+        get(remote_path=full_path, local_path=env_file)
+        env.environment.update(read(env_file))
 
 def prepare(instance, commit, base_dir='/var/www', frontend=False, services=False, users_csv=None, testing=False):
     env.instance = instance
