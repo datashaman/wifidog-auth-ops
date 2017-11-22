@@ -10,6 +10,12 @@ from six import StringIO
 
 template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
+DEPLOY = {
+    'release/0.8.0': [
+        'staging',
+    ],
+}
+
 repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
 
 def load_local_env(*path):
@@ -102,8 +108,10 @@ def test(commit='develop'):
         run('python -m unittest discover -s tests')
 
 @task
-def deploy(instance='auth', commit='develop', users_csv=None):
-    prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
+def deploy(commit='develop', users_csv=None):
+    instances = DEPLOY.get(commit, [])
+    for instance in instances:
+        prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
 
 @task
 def downstream_db(source, destination):
