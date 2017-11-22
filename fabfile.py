@@ -41,6 +41,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
             run('git clone -q %s %s' % (repo, instance))
 
         with cd(instance):
+            run('git remote update -p')
             run('git fetch -q origin %s' % commit)
             run('git checkout -q FETCH_HEAD')
             run('git describe > app/static/version.txt')
