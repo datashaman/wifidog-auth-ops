@@ -13,8 +13,6 @@ template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templa
 DEPLOY = {
     'master': [
         'auth',
-    ],
-    'release/0.8.0': [
         'staging',
     ],
 }
@@ -68,7 +66,7 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
                 run('virtualenv -p /usr/bin/python3 %s' % venv)
 
             with prefix('source %s/bin/activate' % venv):
-                run('pip install -q -r requirements.txt')
+                run('pip install -r requirements.txt')
 
                 if use_local and not testing and not exists('data/local.db'):
                     run('python manage.py db_create_all')
