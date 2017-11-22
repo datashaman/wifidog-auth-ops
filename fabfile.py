@@ -11,6 +11,9 @@ from six import StringIO
 template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
 DEPLOY = {
+    'master': [
+        'auth',
+    ],
     'release/0.8.0': [
         'staging',
     ],

@@ -1,6 +1,9 @@
 test:
 	fab -A -H ubuntu@auth.datashaman.com test:origin/release/0.8.0
 
+deploy-auth:
+	fab -A -H ubuntu@auth.datashaman.com deploy:master
+
 deploy-staging:
 	fab -A -H ubuntu@auth.datashaman.com deploy:release/0.8.0
 
