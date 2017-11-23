@@ -63,10 +63,10 @@ def prepare(instance, commit, base_dir='/var/www', frontend=False, services=Fals
                 upload_template('template.env', '.env', template_dir=template_dir, backup=False, context=env, use_jinja=True)
 
             if not exists(venv):
-                run('virtualenv -p /usr/bin/python2 %s' % venv)
+                run('virtualenv -p /usr/bin/python3 %s' % venv)
 
             with prefix('source %s/bin/activate' % venv):
-                run('pip install -r requirements.txt')
+                run('pip install -I -r requirements.txt')
 
                 if use_local and not testing and not exists('data/local.db'):
                     run('python manage.py db_create_all')
