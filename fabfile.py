@@ -2,6 +2,7 @@ import csv
 import os
 import tempfile
 
+from asbool import asbool
 from dotenvy import parse_string
 from fabric import *
 from fabric.api import cd, get, prefix, run, shell_env, task
@@ -12,7 +13,7 @@ template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templa
 
 DEPLOY = {
     'master': [
-        # 'auth',
+        'auth',
         'staging',
     ],
 }
@@ -115,10 +116,13 @@ def deploy(commit='develop', users_csv=None):
         prepare(instance, commit, '/var/www', frontend=True, services=True, users_csv=users_csv)
 
 @task
-def downstream_db(source, destination):
-    fd, filename = tempfile.mkstemp()
-    os.close(fd)
-    run('cp /var/www/%s/data/local.db %s' % (source, filename))
-    put('anonymise.sql', '/tmp')
-    run('sqlite3 %s < /tmp/anonymise.sql' % filename)
-    run('mv %s /var/www/%s/data/local.db' % (filename, destination))
+def downstream_db(source, destination, anonymise='true'):
+    if asbool(anonymise):
+        fd, filename = tempfile.mkstemp()
+        os.close(fd)
+        run('cp /var/www/%s/data/local.db %s' % (source, filename))
+        put('anonymise.sql', '/tmp')
+        run('sqlite3 %s < /tmp/anonymise.sql' % filename)
+        run('mv %s /var/www/%s/data/local.db' % (filename, destination))
+    else:
+        run('cp /var/www/%s/data/local.db /var/www/%s/data/local.db' % (source, destination))
