@@ -12,7 +12,7 @@ template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templa
 
 DEPLOY = {
     'master': [
-        'auth',
+        # 'auth',
         'staging',
     ],
 }
