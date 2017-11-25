@@ -14,8 +14,10 @@ template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templa
 DEPLOY = {
     'master': [
         'auth',
-        'staging',
     ],
+    'staging': [
+        'staging',
+    ]
 }
 
 repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
