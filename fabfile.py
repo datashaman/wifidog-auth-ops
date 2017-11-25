@@ -128,3 +128,11 @@ def downstream_db(source, destination, anonymise='true'):
         run('mv %s /var/www/%s/data/local.db' % (filename, destination))
     else:
         run('cp /var/www/%s/data/local.db /var/www/%s/data/local.db' % (source, destination))
+
+@task
+def migrate(instance='auth'):
+    # run('sqlite3 /var/www/%s/data/local.db "alter table users add column confirmed_at datetime"' % instance)
+    # run('sqlite3 /var/www/%s/data/local.db "update users set confirmed_at = datetime(\'now\')"' % instance)
+
+    run('sqlite3 /var/www/%s/data/local.db "alter table gateways add column default_minutes integer"' % instance)
+    run('sqlite3 /var/www/%s/data/local.db "alter table gateways add column default_megabytes bigint"' % instance)
