@@ -15,9 +15,6 @@ DEPLOY = {
     'master': [
         'auth',
     ],
-    'staging': [
-        'staging',
-    ]
 }
 
 repo = 'https://github.com/datashaman/wifidog-auth-flask.git'
